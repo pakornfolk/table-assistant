@@ -1,0 +1,311 @@
+/* ==========================================================================
+   Cute Timetable & GPA Master - Timetable Specific Styles
+   ========================================================================== */
+
+/* Top Action Toolbar */
+.timetable-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+/* Cute Timetable Card Wrapper */
+.timetable-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--surface-border);
+  box-shadow: var(--shadow-md);
+  padding: 1.5rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.timetable-header-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+.term-title-wrapper h2 {
+  font-size: 1.3rem;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.term-title-wrapper p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.timetable-stats-pill {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--primary-soft);
+  padding: 0.45rem 1rem;
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.timetable-stats-pill strong {
+  color: var(--primary);
+  font-size: 0.95rem;
+}
+
+/* Timetable Grid System */
+.timetable-scroll-container {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: #fff;
+  position: relative;
+  scrollbar-width: thin;
+}
+
+.timetable-grid {
+  display: grid;
+  /* 1st col: Day label (90px), Remaining cols: 12 hourly blocks (08:00 - 20:00) */
+  grid-template-columns: 85px repeat(12, minmax(80px, 1fr));
+  min-width: 1045px;
+  position: relative;
+}
+
+/* Time Headers */
+.grid-time-header {
+  grid-column: 2 / -1;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  background: var(--primary-soft);
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.time-slot-label {
+  padding: 0.65rem 0.25rem;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-right: 1px dashed rgba(255, 117, 151, 0.2);
+}
+
+.time-slot-label:last-child {
+  border-right: none;
+}
+
+/* Days Rows */
+.grid-day-row {
+  display: contents;
+}
+
+.day-header-cell {
+  background: #fff9fb;
+  border-right: 2px solid var(--surface-border);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 0.75rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-main);
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.03);
+}
+
+.day-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full);
+  margin-top: 0.2rem;
+  font-weight: 500;
+}
+
+.day-badge.mon { background: #fff3bf; color: #d97706; }
+.day-badge.tue { background: #ffe3ec; color: #e11d48; }
+.day-badge.wed { background: #dcfce7; color: #16a34a; }
+.day-badge.thu { background: #ffedd5; color: #ea580c; }
+.day-badge.fri { background: #e0f2fe; color: #0284c7; }
+.day-badge.sat { background: #f3e8ff; color: #9333ea; }
+.day-badge.sun { background: #fee2e2; color: #dc2626; }
+
+.day-time-track {
+  grid-column: 2 / -1;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  position: relative;
+  min-height: 102px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background-image: linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px);
+  background-size: calc(100% / 12) 100%;
+}
+
+/* Class Event Block */
+.class-block {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  border-radius: var(--radius-md);
+  padding: 0.55rem 0.7rem;
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 5;
+}
+
+.class-block:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  z-index: 20;
+}
+
+.class-block-code {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.85;
+  margin-bottom: 2px;
+}
+
+.class-block-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.25;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.class-block-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+.class-room-badge {
+  background: rgba(255, 255, 255, 0.78);
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.72rem;
+  color: var(--text-main);
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.class-note-indicator {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  margin-left: 0.25rem;
+}
+
+/* Hidden export rendering frames */
+.export-container {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  background: #ffffff;
+  padding: 2.5rem;
+  border-radius: 28px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* 9:16 Mobile Wallpaper Canvas container */
+.export-phone-frame {
+  width: 1080px;
+  height: 1920px;
+  background: linear-gradient(135deg, #fff2f6 0%, #f7f0ff 50%, #fff6ec 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 110px 60px 80px 60px;
+  font-family: var(--font-main);
+  position: relative;
+}
+
+.phone-lockscreen-spacer {
+  /* Area for Phone Clock/Date widget so table isn't covered */
+  height: 190px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.phone-wallpaper-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.phone-wallpaper-header h1 {
+  font-size: 2.4rem;
+  color: var(--primary);
+  margin-bottom: 0.4rem;
+}
+
+.phone-wallpaper-header p {
+  font-size: 1.3rem;
+  color: var(--text-muted);
+}
+
+.phone-wallpaper-grid {
+  background: #ffffff;
+  border-radius: 32px;
+  padding: 1.75rem;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.06);
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Empty Schedule State */
+.empty-timetable-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: var(--text-muted);
+}
+
+.empty-timetable-state .empty-icon {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  animation: bounceSlow 2s infinite ease-in-out;
+}
+
+@keyframes bounceSlow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}

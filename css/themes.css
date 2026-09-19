@@ -1,0 +1,126 @@
+/* ==========================================================================
+   Cute Timetable & GPA Master - Themes & Design Tokens
+   ========================================================================== */
+
+:root {
+  /* Default Theme: Strawberry Milk 🍓 */
+  --primary: #ff7597;
+  --primary-hover: #ff527f;
+  --primary-light: #ffe8ef;
+  --primary-soft: #fff2f6;
+  --secondary: #9b72cf;
+  --accent: #ffb7b2;
+  --accent-light: #fff0f0;
+  --bg-gradient: linear-gradient(135deg, #fff5f7 0%, #f7f2ff 50%, #fff9f5 100%);
+  --surface: #ffffff;
+  --surface-glass: rgba(255, 255, 255, 0.88);
+  --surface-border: rgba(255, 117, 151, 0.18);
+  --text-main: #3d2c35;
+  --text-muted: #826c79;
+  --text-light: #aa98a4;
+  --shadow-sm: 0 4px 12px rgba(255, 117, 151, 0.08);
+  --shadow-md: 0 8px 24px rgba(255, 117, 151, 0.12);
+  --shadow-lg: 0 16px 36px rgba(255, 117, 151, 0.18);
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+  --font-main: 'Mitr', 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-cute: 'Itim', cursive, sans-serif;
+}
+
+/* 1. Strawberry Milk 🍓 */
+[data-theme="strawberry"] {
+  --primary: #ff7597;
+  --primary-hover: #ff527f;
+  --primary-light: #ffe8ef;
+  --primary-soft: #fff2f6;
+  --secondary: #a06cd5;
+  --accent: #ffb7b2;
+  --accent-light: #fff0f0;
+  --bg-gradient: linear-gradient(135deg, #fff5f7 0%, #fbf5ff 50%, #fffbf8 100%);
+  --surface-border: rgba(255, 117, 151, 0.18);
+  --shadow-md: 0 8px 24px rgba(255, 117, 151, 0.12);
+}
+
+/* 2. Lavender Dream 💜 */
+[data-theme="lavender"] {
+  --primary: #9b6bcc;
+  --primary-hover: #834fba;
+  --primary-light: #f1e7fe;
+  --primary-soft: #f8f3ff;
+  --secondary: #ff7597;
+  --accent: #c4a1eb;
+  --accent-light: #faf5ff;
+  --bg-gradient: linear-gradient(135deg, #f7f3ff 0%, #fcf5ff 50%, #f0f7ff 100%);
+  --surface-border: rgba(155, 107, 204, 0.2);
+  --shadow-md: 0 8px 24px rgba(155, 107, 204, 0.14);
+}
+
+/* 3. Matcha Latte 🍵 */
+[data-theme="matcha"] {
+  --primary: #52a46b;
+  --primary-hover: #3d8953;
+  --primary-light: #e4f5e9;
+  --primary-soft: #f2faf4;
+  --secondary: #e59866;
+  --accent: #8ed0a0;
+  --accent-light: #f6fbf7;
+  --bg-gradient: linear-gradient(135deg, #f3fbf5 0%, #fcfbf5 50%, #edf8f0 100%);
+  --surface-border: rgba(82, 164, 107, 0.2);
+  --shadow-md: 0 8px 24px rgba(82, 164, 107, 0.12);
+}
+
+/* 4. Peach Sunset 🍑 */
+[data-theme="peach"] {
+  --primary: #ff7e5f;
+  --primary-hover: #fa633f;
+  --primary-light: #ffebe5;
+  --primary-soft: #fff5f2;
+  --secondary: #feb47b;
+  --accent: #ffd166;
+  --accent-light: #fffbf0;
+  --bg-gradient: linear-gradient(135deg, #fff7f3 0%, #fffcf5 50%, #ffeef2 100%);
+  --surface-border: rgba(255, 126, 95, 0.2);
+  --shadow-md: 0 8px 24px rgba(255, 126, 95, 0.14);
+}
+
+/* 5. UTCC Blue & Gold Cute 💙 */
+[data-theme="utcc"] {
+  --primary: #1e5ba3;
+  --primary-hover: #14447d;
+  --primary-light: #e4effb;
+  --primary-soft: #f1f6fd;
+  --secondary: #d99000;
+  --accent: #5dade2;
+  --accent-light: #fef9e7;
+  --bg-gradient: linear-gradient(135deg, #f0f6fc 0%, #fdfbf2 50%, #eaf2f8 100%);
+  --surface-border: rgba(30, 91, 163, 0.18);
+  --shadow-md: 0 8px 24px rgba(30, 91, 163, 0.12);
+}
+
+/* 6. Cloudy Sky ☁️ */
+[data-theme="cloudy"] {
+  --primary: #4a90e2;
+  --primary-hover: #357abd;
+  --primary-light: #e6f0fa;
+  --primary-soft: #f4f8fd;
+  --secondary: #7ac1eb;
+  --accent: #b3d9ff;
+  --accent-light: #f7fbff;
+  --bg-gradient: linear-gradient(135deg, #f2f7fc 0%, #f9fcff 50%, #f0f4f9 100%);
+  --surface-border: rgba(74, 144, 226, 0.2);
+  --shadow-md: 0 8px 24px rgba(74, 144, 226, 0.12);
+}
+
+/* Pastel Class Block Colors */
+:root {
+  --color-class-pink: #ffc2d1;
+  --color-class-purple: #dfccf1;
+  --color-class-mint: #c1ebd0;
+  --color-class-peach: #fed1b8;
+  --color-class-yellow: #fde89c;
+  --color-class-sky: #bfe3fc;
+  --color-class-coral: #ffb4a2;
+  --color-class-lavender: #d8bbff;
+}

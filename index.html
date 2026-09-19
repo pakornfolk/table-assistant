@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="strawberry">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cute Timetable & GPA Master 🎓💖 | UTCC Digital Marketing</title>
+  
+  <!-- Google Fonts: Mitr, Itim, Prompt -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Itim&family=Mitr:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/timetable.css">
+  <link rel="stylesheet" href="css/grades.css">
+
+  <!-- External CDN Libraries (html2canvas, supabase-js) -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Progressive Web App (PWA) & Mobile Web App Meta -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="ตารางเรียน">
+  <meta name="theme-color" content="#ff7597">
+</head>
+<body>
+
+  <!-- Smart Autocomplete Datalists -->
+  <datalist id="historyCourseCodes"></datalist>
+  <datalist id="historyCourseTitles"></datalist>
+  <datalist id="historyRooms"></datalist>
+
+  <div class="app-container">
+    
+    <!-- Header & Navigation -->
+    <header class="header-glass">
+      <div class="brand-area">
+        <div class="brand-badge-icon">🎀</div>
+        <div class="brand-titles">
+          <h1>Cute Timetable <span class="highlight">& GPA</span></h1>
+          <p>ม.หอการค้าไทย (UTCC) • คณะบริหารธุรกิจ สาขาการตลาดดิจิทัล</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="nav-tabs">
+        <button class="nav-tab-btn active" data-tab="timetable">
+          <span>📅</span> <span>ตารางเรียน</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="grades">
+          <span>📊</span> <span>คำนวณเกรด</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="countdown">
+          <span>⏳</span> <span>นับถอยหลัง</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="ai">
+          <span>🤖</span> <span>น้อง AI</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="settings">
+          <span>🎨</span> <span>ปรับแต่งธีม</span>
+        </button>
+      </nav>
+
+      <!-- Top Action: Add to Home Screen -->
+      <div class="top-actions">
+        <button class="btn btn-sm btn-secondary" id="btnHeaderPwaGuide" style="border-radius:var(--radius-full);padding:0.35rem 0.85rem;font-size:0.8rem;gap:0.35rem;" title="วิธีเพิ่มเว็บแอปบนหน้าจอมือถือ">
+          <span>📲</span> <span>เพิ่มลงหน้าจอมือถือ</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Collision Alert Banner -->
+    <div id="collisionAlertBox" class="cute-alert cute-alert-danger" style="display: none;"></div>
+
+    <!-- =========================================================================
+         TAB 1: TIMETABLE BUILDER (ตารางเรียน)
+         ========================================================================= -->
+    <main id="tabContent-timetable" class="tab-content active">
+      <!-- Toolbar -->
+      <div class="timetable-toolbar">
+        <div class="toolbar-group">
+          <button class="btn btn-primary" id="btnOpenAddClass">
+            <span>✨</span> <span>+ เพิ่มวิชาเรียน</span>
+          </button>
+          <div class="timetable-stats-pill">
+            <span>ทั้งหมด: <strong id="classCountStat">0</strong> วิชา</span>
+          </div>
+        </div>
+
+        <div class="toolbar-group">
+          <!-- Download & Mobile Buttons -->
+          <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+            <button class="btn btn-secondary" id="btnToolbarPwaGuide" title="วิธีเพิ่มเป็นไอคอนบนหน้าจอมือถือ">
+              <span>📲</span> <span>เพิ่มลงหน้าจอมือถือ</span>
+            </button>
+            <button class="btn btn-secondary" onclick="window.imageExport.exportTimetable('phone', 'png')" title="เซฟเป็นสัดส่วนพอดีจอมือถือ">
+              <span>📱</span> <span>Wallpaper มือถือ (9:16)</span>
+            </button>
+            <button class="btn btn-secondary" onclick="window.imageExport.exportTimetable('landscape', 'png')" title="เซฟเป็นภาพแนวนอน">
+              <span>💻</span> <span>แนวนอน (PNG)</span>
+            </button>
+            <button class="btn btn-secondary" onclick="window.imageExport.exportTimetable('landscape', 'jpg')" title="เซฟเป็น JPG">
+              <span>🖼️</span> <span>JPG</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timetable Card Container -->
+      <div class="timetable-card">
+        <div class="timetable-header-info">
+          <div class="term-title-wrapper">
+            <h2>🌸 ตารางเรียนภาคการศึกษาปัจจุบัน</h2>
+            <p>คลิกที่การ์ดวิชาเพื่อเปิดดูหรือจดบันทึกย่อ (Quick Note) ได้ค่ะ</p>
+          </div>
+        </div>
+
+        <div class="timetable-scroll-container" id="timetableScrollContainer">
+          <div id="timetableGridContainer"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- =========================================================================
+         TAB 2: GRADE & GPA/GPAX CALCULATOR (คำนวณเกรด)
+         ========================================================================= -->
+    <main id="tabContent-grades" class="tab-content">
+      <!-- Cumulative GPA Overview Card -->
+      <div class="gpa-overview-card">
+        <!-- Big GPA Score -->
+        <div class="gpa-score-box">
+          <div class="gpa-label">เกรดเฉลี่ยสะสม (GPAX)</div>
+          <div class="gpa-value-large" id="cumulativeGpaxDisplay">0.00</div>
+          <div class="honors-badge honors-none" id="cumulativeHonorsDisplay">คำนวณผลการเรียน</div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="gpa-metrics-grid">
+          <div class="metric-card">
+            <div class="metric-card-title">หน่วยกิตสะสมที่ผ่าน</div>
+            <div class="metric-card-value"><span id="cumulativeCreditsDisplay">0</span> <small>หน่วยกิต</small></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card-title">หน่วยกิตนำมาคิด GPA</div>
+            <div class="metric-card-value"><span id="qualityCreditsDisplay">0</span> <small>หน่วยกิต</small></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card-title">แต้มคะแนนสะสม</div>
+            <div class="metric-card-value"><span id="totalPointsDisplay">0.0</span> <small>แต้ม</small></div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="gpa-quick-actions">
+          <button class="btn btn-primary" onclick="window.gradeManager.addAcademicYear()">
+            <span>🎓</span> <span>+ เพิ่มชั้นปีใหม่ (Year)</span>
+          </button>
+          <button class="btn btn-secondary" onclick="window.gradeManager.addSemester()">
+            <span>✨</span> <span>+ เพิ่มเทอมใหม่</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Target GPA Simulator -->
+      <div class="simulator-card">
+        <div class="simulator-header">
+          <h3><span>🎯</span> <span>เครื่องมือวางแผนเกรดเป้าหมาย (Target GPA Simulator)</span></h3>
+          <span style="font-size:0.8rem;color:var(--text-muted);">สูตรมาตรฐานสากลตามเกณฑ์ ม.หอการค้าไทย</span>
+        </div>
+        <div class="simulator-form">
+          <div>
+            <label class="form-label">เกรดเฉลี่ยสะสม (GPAX) ที่อยากได้</label>
+            <input type="number" id="simTargetGpax" class="form-input" placeholder="เช่น 3.50 หรือ 3.25" step="0.01" min="0" max="4.00" value="3.50">
+          </div>
+          <div>
+            <label class="form-label">จำนวนหน่วยกิตที่เหลือในเทอมถัดไป</label>
+            <input type="number" id="simRemainingCredits" class="form-input" placeholder="เช่น 18 หรือ 21" step="1" min="1" max="100" value="18">
+          </div>
+          <button class="btn btn-primary" id="btnRunSimulator">
+            <span>🔍</span> <span>คำนวณเป้าหมาย</span>
+          </button>
+        </div>
+        <div id="simResultBox" class="simulator-result-box"></div>
+      </div>
+
+      <!-- Yearly GPA Summary Breakdown -->
+      <div id="yearlySummaryContainer" class="yearly-summary-section"></div>
+
+      <!-- Semesters List Grouped by Academic Year -->
+      <div class="semesters-container" id="semestersContainer"></div>
+    </main>
+
+    <!-- =========================================================================
+         TAB 3: COUNTDOWN (นับถอยหลังวันสอบ & ส่งงาน)
+         ========================================================================= -->
+    <main id="tabContent-countdown" class="tab-content">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+        <div>
+          <h2 style="font-size:1.35rem;color:var(--text-main);">⏳ นับถอยหลังวันสำคัญ & งานโปรเจกต์</h2>
+          <p style="font-size:0.88rem;color:var(--text-muted);">ช่วยเตือนความจำ ไม่พลาดทุก Deadline สำคัญในการเรียน</p>
+        </div>
+        <button class="btn btn-primary" id="btnAddCountdown">
+          <span>✨</span> <span>+ เพิ่มวันสำคัญ</span>
+        </button>
+      </div>
+
+      <div id="countdownListContainer" style="display:flex;flex-direction:column;gap:1rem;"></div>
+    </main>
+
+    <!-- =========================================================================
+         TAB 4: AI ASSISTANT (น้องกุลสตรี AI / Study Buddy)
+         ========================================================================= -->
+    <main id="tabContent-ai" class="tab-content">
+      <div style="background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--surface-border);box-shadow:var(--shadow-md);padding:1.5rem;max-width:850px;margin:0 auto;">
+        
+        <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--surface-border);padding-bottom:1rem;margin-bottom:1rem;flex-wrap:wrap;gap:0.75rem;">
+          <div style="display:flex;align-items:center;gap:0.75rem;">
+            <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;font-size:1.6rem;box-shadow:0 4px 12px rgba(255,117,151,0.3);">
+              🎀
+            </div>
+            <div>
+              <h3 style="font-size:1.15rem;color:var(--text-main);">น้องกุลสตรี AI 🌸</h3>
+              <p style="font-size:0.8rem;color:var(--text-muted);">เพื่อนสนิท & ที่ปรึกษาการตลาดดิจิทัล ม.หอการค้าไทย</p>
+            </div>
+          </div>
+          <div id="aiModeStatusBadge" style="font-size:0.8rem;background:var(--primary-soft);color:var(--primary);padding:0.35rem 0.85rem;border-radius:var(--radius-full);font-weight:600;border:1px solid var(--surface-border);">
+            💡 โหมดไกด์คำถามสำเร็จรูป
+          </div>
+        </div>
+
+        <!-- Guided Prompt Chips categorized -->
+        <div style="margin-bottom:1.15rem;background:#ffffff;border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:1rem;">
+          <div style="font-size:0.82rem;font-weight:700;color:var(--primary);margin-bottom:0.65rem;display:flex;align-items:center;gap:0.4rem;">
+            <span>💡</span> <span>คลิกเลือกถามคำถามยอดฮิตได้ทันที:</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:0.45rem;">
+            <!-- Category: เกรด & ตาราง -->
+            <button class="btn btn-sm btn-secondary" onclick="window.aiAdvisor.askGuided('วิเคราะห์เกรดสะสมและตารางเรียนปัจจุบันให้หน่อยค่ะ')">
+              📊 วิเคราะห์เกรด & ตารางเรียน
+            </button>
+            <button class="btn btn-sm btn-secondary" onclick="window.aiAdvisor.askGuided('เทคนิคการเก็บเกียรตินิยม ม.หอการค้าไทย ต้องวางแผนยังไง')">
+              🏆 วางแผนคว้าเกียรตินิยม
+            </button>
+            <!-- Category: การตลาดดิจิทัล UTCC -->
+            <button class="btn btn-sm btn-secondary" onclick="window.aiAdvisor.askGuided('ช่วยคิดไอเดียแคมเปญ TikTok ให้ปังสำหรับส่งวิชาการตลาดดิจิทัล')">
+              📱 ไอเดียแคมเปญ TikTok ไวรัล
+            </button>
+            <button class="btn btn-sm btn-secondary" onclick="window.aiAdvisor.askGuided('ทักษะการตลาดดิจิทัลที่เด็กบริหารหอการค้าจบไปต้องมี')">
+              💼 ทักษะสำคัญเด็กการตลาด
+            </button>
+            <!-- Category: ของกิน & ชีวิตรอบ ม.หอการค้า -->
+            <button class="btn btn-sm btn-secondary" onclick="window.aiAdvisor.askGuided('แนะนำร้านอร่อยเด็ดรอบ ม.หอการค้าไทย ซอยวิภาวดี 2 และประชาสงเคราะห์')">
+              🍜 ร้านอร่อยรอบ ม.หอการค้า
+            </button>
+            <!-- Category: กำลังใจ -->
+            <button class="btn btn-sm btn-secondary" onclick="window.aiAdvisor.askGuided('ขอกำลังใจในการอ่านหนังสือสอบและการเรียนหน่อยค่ะ')">
+              ☕ ขอกำลังใจเติมพลัง
+            </button>
+            <button class="btn btn-sm btn-secondary" onclick="window.aiAdvisor.askGuided('เหนื่อยกับการทำงานกลุ่มมากเลย ปลอบใจหน่อย')">
+              🧸 ปลอบใจเรื่องงานกลุ่ม
+            </button>
+          </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div id="aiChatMessages" style="height:360px;overflow-y:auto;background:var(--primary-soft);border-radius:var(--radius-md);padding:1.25rem;margin-bottom:1rem;border:1px solid var(--surface-border);"></div>
+
+        <!-- Input Box -->
+        <div style="display:flex;gap:0.6rem;">
+          <input type="text" id="aiChatInput" class="form-input" placeholder="พิมพ์ข้อความถามคุยกับน้องกุลสตรีได้ทุกเรื่องเลยค่ะ..." style="flex:1;">
+          <button class="btn btn-primary" id="aiChatSendBtn">
+            <span>ส่ง</span> <span>💌</span>
+          </button>
+        </div>
+
+        <!-- Gemini API Key Input Bar (ซ่อนไว้เพื่อความสะอาดตา สวยงาม) -->
+        <div style="display: none;">
+          <input type="password" id="geminiApiKeyInput">
+          <button id="btnSaveGeminiKey"></button>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- =========================================================================
+         TAB 5: THEME SETTINGS (ปรับแต่งธีมสี)
+         ========================================================================= -->
+    <main id="tabContent-settings" class="tab-content">
+      <div style="max-width:640px;margin:0 auto;">
+        
+        <!-- Theme & Color Settings -->
+        <div style="background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--surface-border);padding:1.75rem;box-shadow:var(--shadow-sm);">
+          <h3 style="font-size:1.15rem;color:var(--text-main);margin-bottom:0.5rem;display:flex;align-items:center;gap:0.4rem;">
+            <span>🎨</span> <span>ปรับแต่งธีมสีน่ารัก (Theme Customizer)</span>
+          </h3>
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1.25rem;">
+            เลือกชุดสีพาสเทลสำเร็จรูป หรือเลือกผสมเฉดสีโปรดของคุณได้เองแบบ Real-time
+          </p>
+
+          <label class="form-label">ชุดสีพาสเทลยอดฮิต</label>
+          <div id="themePresetsContainer" style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:1.5rem;"></div>
+
+          <div style="border-top:1px dashed var(--surface-border);padding-top:1.25rem;">
+            <label class="form-label">เลือกสีเองตามใจชอบ (Custom Color Picker)</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+              <div>
+                <span style="font-size:0.8rem;color:var(--text-muted);">สีหลัก (Primary)</span>
+                <input type="color" id="customPrimaryPicker" class="form-input" style="height:44px;padding:4px;cursor:pointer;">
+              </div>
+              <div>
+                <span style="font-size:0.8rem;color:var(--text-muted);">สีรอง (Accent)</span>
+                <input type="color" id="customAccentPicker" class="form-input" style="height:44px;padding:4px;cursor:pointer;">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Supabase Cloud Connection (ซ่อนตามคำขอ เพื่อความเรียบหรูและมินิมอล) -->
+        <div style="display: none;">
+          <input type="text" id="supabaseUrlInput">
+          <input type="password" id="supabaseKeyInput">
+          <button id="btnSaveSupabase"></button>
+          <button id="btnTestSupabase"></button>
+          <button id="btnPullSupabase"></button>
+          <button id="btnCopySupabaseSql"></button>
+        </div>
+
+      </div>
+    </main>
+
+  </div><!-- /.app-container -->
+
+  <!-- =========================================================================
+       MODALS
+       ========================================================================= -->
+
+  <!-- 1. Add / Edit Class Modal -->
+  <div class="modal-overlay" id="addClassModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title"><span>✨</span> <span>เพิ่มวิชาเรียนในตาราง</span></h3>
+        <button class="modal-close-btn" data-close-modal>✕</button>
+      </div>
+      <form id="formAddClass">
+        <div class="modal-body">
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">รหัสวิชา <span class="opt">(มีระบบช่วยจำ)</span></label>
+              <input type="text" id="inputClassCode" class="form-input" placeholder="เช่น MK101, DM201" list="historyCourseCodes">
+            </div>
+            <div class="form-group">
+              <label class="form-label">ห้องเรียน <span class="opt">(มีระบบช่วยจำ)</span></label>
+              <input type="text" id="inputClassRoom" class="form-input" placeholder="เช่น 7301, 10204, Zoom" list="historyRooms">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">ชื่อวิชา <span class="req">*</span> <span class="opt">(มีระบบช่วยจำ)</span></label>
+            <input type="text" id="inputClassTitle" class="form-input" placeholder="เช่น หลักการตลาดดิจิทัล" required list="historyCourseTitles">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">วันที่เรียน <span class="req">*</span></label>
+              <select id="inputClassDay" class="form-select">
+                <option value="mon">วันจันทร์ (Monday)</option>
+                <option value="tue">วันอังคาร (Tuesday)</option>
+                <option value="wed">วันพุธ (Wednesday)</option>
+                <option value="thu">วันพฤหัสบดี (Thursday)</option>
+                <option value="fri">วันศุกร์ (Friday)</option>
+                <option value="sat">วันเสาร์ (Saturday)</option>
+                <option value="sun">วันอาทิตย์ (Sunday)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">ช่วงเวลาเรียน <span class="req">*</span></label>
+              <div style="display:flex;align-items:center;gap:0.4rem;">
+                <input type="time" id="inputClassStartTime" class="form-input" value="09:00" required>
+                <span>ถึง</span>
+                <input type="time" id="inputClassEndTime" class="form-input" value="12:00" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- Color Tag Selection -->
+          <div class="form-group">
+            <label class="form-label">โทนสีพาสเทลประจำวิชา</label>
+            <div class="color-swatch-list" id="classColorSwatches">
+              <div class="color-swatch-item active" style="background:#ffc2d1;" data-color="var(--color-class-pink)" title="ชมพูพาสเทล"></div>
+              <div class="color-swatch-item" style="background:#dfccf1;" data-color="var(--color-class-purple)" title="ม่วงลาเวนเดอร์"></div>
+              <div class="color-swatch-item" style="background:#c1ebd0;" data-color="var(--color-class-mint)" title="เขียวมัทฉะ"></div>
+              <div class="color-swatch-item" style="background:#fed1b8;" data-color="var(--color-class-peach)" title="ส้มพีช"></div>
+              <div class="color-swatch-item" style="background:#fde89c;" data-color="var(--color-class-yellow)" title="เหลืองเนย"></div>
+              <div class="color-swatch-item" style="background:#bfe3fc;" data-color="var(--color-class-sky)" title="ฟ้าพาสเทล"></div>
+              <div class="color-swatch-item" style="background:#ffb4a2;" data-color="var(--color-class-coral)" title="คอรัล"></div>
+            </div>
+          </div>
+
+          <!-- Quick Note -->
+          <div class="form-group">
+            <label class="form-label">บันทึกย่อ / ลิงก์ชีทสรุป <span class="opt">(ใส่หรือไม่ใส่ก็ได้)</span></label>
+            <input type="text" id="inputClassNote" class="form-input" placeholder="เช่น กลุ่ม 4 ทำแคมเปญ TikTok, ลิงก์ Drive">
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal>ยกเลิก</button>
+          <button type="submit" class="btn btn-primary"><span>บันทึกลงตาราง</span> <span>🌸</span></button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Add Course to Semester Modal -->
+  <div class="modal-overlay" id="addCourseModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title"><span>📚</span> <span>เพิ่มวิชาใน: <span id="modalSemesterTargetName" style="color:var(--primary);"></span></span></h3>
+        <button class="modal-close-btn" data-close-modal>✕</button>
+      </div>
+      <form id="formAddCourse">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">รหัสวิชา</label>
+              <input type="text" id="courseCodeInput" class="form-input" placeholder="เช่น DM201" list="historyCourseCodes">
+            </div>
+            <div class="form-group">
+              <label class="form-label">หน่วยกิต</label>
+              <select id="courseCreditsInput" class="form-select">
+                <option value="1">1 หน่วยกิต</option>
+                <option value="1.5">1.5 หน่วยกิต</option>
+                <option value="2">2 หน่วยกิต</option>
+                <option value="3" selected>3 หน่วยกิต</option>
+                <option value="4">4 หน่วยกิต</option>
+                <option value="5">5 หน่วยกิต</option>
+                <option value="6">6 หน่วยกิต</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">ชื่อวิชา <span class="req">*</span></label>
+            <input type="text" id="courseTitleInput" class="form-input" placeholder="เช่น การตลาดดิจิทัลเบื้องต้น" required list="historyCourseTitles">
+          </div>
+          <div class="form-group">
+            <label class="form-label">เกรดที่ได้</label>
+            <select id="courseGradeInput" class="form-select">
+              <option value="A">A (4.0)</option>
+              <option value="B+">B+ (3.5)</option>
+              <option value="B">B (3.0)</option>
+              <option value="C+">C+ (2.5)</option>
+              <option value="C">C (2.0)</option>
+              <option value="D+">D+ (1.5)</option>
+              <option value="D">D (1.0)</option>
+              <option value="F">F (0.0)</option>
+              <option value="S">S (ผ่าน - ไม่คิด GPA)</option>
+              <option value="U">U (ไม่ผ่าน - ไม่คิด GPA)</option>
+              <option value="W">W (ถอน - ไม่คิด GPA)</option>
+              <option value="P">P (ผ่าน - ไม่คิด GPA)</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal>ยกเลิก</button>
+          <button type="submit" class="btn btn-primary">เพิ่มวิชานี้ ✨</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. Quick Note Modal -->
+  <div class="modal-overlay" id="quickNoteModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title"><span>📝</span> <span id="quickNoteClassTitle">วิชาเรียน</span></h3>
+        <button class="modal-close-btn" data-close-modal>✕</button>
+      </div>
+      <div class="modal-body">
+        <p id="quickNoteTimeRoom" style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem;"></p>
+        <div class="form-group">
+          <label class="form-label">บันทึกย่อ / ข้อความเตือนความจำ / ลิงก์ส่งงาน</label>
+          <textarea id="quickNoteInput" class="form-textarea" rows="4" placeholder="เช่น กลุ่ม 3 สมาชิก 4 คน, นัดประชุมวันพุธ 18:00"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content:space-between;">
+        <button type="button" class="btn btn-secondary" style="color:#ef4444;" onclick="window.timetableManager.deleteClass(document.getElementById('quickNoteModal').dataset.currentClassId); document.getElementById('quickNoteModal').classList.remove('open');">
+          🗑️ ลบวิชานี้ออกจากตาราง
+        </button>
+        <div style="display:flex;gap:0.5rem;">
+          <button type="button" class="btn btn-secondary" data-close-modal>ปิด</button>
+          <button type="button" class="btn btn-primary" onclick="window.timetableManager.saveQuickNote()">บันทึกโน้ต 🌸</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Add Countdown Modal -->
+  <div class="modal-overlay" id="addCountdownModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title"><span>⏳</span> <span>เพิ่มวันสำคัญนับถอยหลัง</span></h3>
+        <button class="modal-close-btn" data-close-modal>✕</button>
+      </div>
+      <form id="formAddCountdown">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">หัวข้องาน / การสอบ <span class="req">*</span></label>
+            <input type="text" id="inputCountTitle" class="form-input" placeholder="เช่น สอบปลายภาค DM201" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">วันที่กำหนด <span class="req">*</span></label>
+              <input type="date" id="inputCountDate" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">หมวดหมู่</label>
+              <select id="inputCountTag" class="form-select">
+                <option value="📚 การสอบ">📚 การสอบ</option>
+                <option value="🎀 ส่งงาน">🎀 ส่งงาน / โปรเจกต์</option>
+                <option value="💼 สัมภาษณ์/พรีเซนต์">💼 สัมภาษณ์ / พรีเซนต์</option>
+                <option value="🎉 กิจกรรม">🎉 กิจกรรม</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">บันทึกเพิ่มเติม</label>
+            <input type="text" id="inputCountNote" class="form-input" placeholder="เช่น ทวนสไลด์บทที่ 1-5">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal>ยกเลิก</button>
+          <button type="submit" class="btn btn-primary">เพิ่มวันสำคัญ ⏳✨</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. Add to Home Screen (PWA) Guide Modal -->
+  <div class="modal-overlay" id="pwaGuideModal">
+    <div class="modal-dialog" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 class="modal-title"><span>📲</span> <span>วิธีเพิ่มลงหน้าจอมือถือ (Web App)</span></h3>
+        <button class="modal-close-btn" data-close-modal>✕</button>
+      </div>
+      <div class="modal-body">
+        
+        <!-- Platform Toggle Tabs -->
+        <div style="display:flex;gap:0.5rem;margin-bottom:1.25rem;background:var(--primary-soft);padding:4px;border-radius:var(--radius-full);border:1px solid var(--surface-border);">
+          <button type="button" id="pwaTabIos" class="btn btn-sm active" style="flex:1;border-radius:var(--radius-full);font-weight:600;padding:0.45rem;background:var(--surface);color:var(--primary);box-shadow:var(--shadow-sm);border:none;">
+            🍎 iPhone (Safari)
+          </button>
+          <button type="button" id="pwaTabAndroid" class="btn btn-sm" style="flex:1;border-radius:var(--radius-full);font-weight:600;padding:0.45rem;background:transparent;color:var(--text-muted);border:none;">
+            🤖 Android (Chrome)
+          </button>
+        </div>
+
+        <!-- iOS Content -->
+        <div id="pwaContentIos">
+          <div style="display:flex;flex-direction:column;gap:0.85rem;">
+            <div style="display:flex;align-items:flex-start;gap:0.85rem;background:#fff;border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.9rem;">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">1</div>
+              <div>
+                <strong style="font-size:0.92rem;color:var(--text-main);">เปิดเว็บด้วย Safari</strong>
+                <p style="font-size:0.82rem;color:var(--text-muted);margin-top:2px;">ตรวจสอบให้แน่ใจว่าเปิดผ่านแอป <strong>Safari</strong> บน iPhone นะคะ</p>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:flex-start;gap:0.85rem;background:#fff;border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.9rem;">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">2</div>
+              <div>
+                <strong style="font-size:0.92rem;color:var(--text-main);">กดปุ่ม "แชร์" (Share)</strong>
+                <p style="font-size:0.82rem;color:var(--text-muted);margin-top:2px;">กดปุ่มสี่เหลี่ยมที่มีลูกศรชี้ขึ้น ตรงแถบด้านล่างของจอ</p>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:flex-start;gap:0.85rem;background:#fff;border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.9rem;">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">3</div>
+              <div>
+                <strong style="font-size:0.92rem;color:var(--text-main);">เลือก "เพิ่มไปยังหน้าจอโฮม"</strong>
+                <p style="font-size:0.82rem;color:var(--text-muted);margin-top:2px;">เลื่อนลงมาด้านล่างแล้วแตะที่เมนู <strong>"เพิ่มไปยังหน้าจอโฮม" (Add to Home Screen)</strong> ➕</p>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:flex-start;gap:0.85rem;background:#fff;border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.9rem;">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">4</div>
+              <div>
+                <strong style="font-size:0.92rem;color:var(--text-main);">กดปุ่ม "เพิ่ม" (Add)</strong>
+                <p style="font-size:0.82rem;color:var(--text-muted);margin-top:2px;">กด <strong>"เพิ่ม"</strong> ที่มุมขวาบน จะได้ไอคอนแอปตารางเรียนสุดคิ้วท์ 🎀 บนหน้าจอทันทีค่ะ!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Android Content -->
+        <div id="pwaContentAndroid" style="display:none;">
+          <div style="display:flex;flex-direction:column;gap:0.85rem;">
+            <div style="display:flex;align-items:flex-start;gap:0.85rem;background:#fff;border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.9rem;">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">1</div>
+              <div>
+                <strong style="font-size:0.92rem;color:var(--text-main);">เปิดเว็บด้วย Google Chrome</strong>
+                <p style="font-size:0.82rem;color:var(--text-muted);margin-top:2px;">เข้าเว็บไซต์นี้ผ่านเบราว์เซอร์ <strong>Chrome</strong> บนมือถือ Android</p>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:flex-start;gap:0.85rem;background:#fff;border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.9rem;">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">2</div>
+              <div>
+                <strong style="font-size:0.92rem;color:var(--text-main);">กดปุ่ม "จุด 3 จุด" (⋮)</strong>
+                <p style="font-size:0.82rem;color:var(--text-muted);margin-top:2px;">แตะที่ไอคอนเมนูจุดสามจุดมุมบนขวาของหน้าจอ Chrome</p>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:flex-start;gap:0.85rem;background:#fff;border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.9rem;">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">3</div>
+              <div>
+                <strong style="font-size:0.92rem;color:var(--text-main);">เลือก "ติดตั้งแอป" หรือ "เพิ่มลงในหน้าจอหลัก"</strong>
+                <p style="font-size:0.82rem;color:var(--text-muted);margin-top:2px;">แตะที่เมนู <strong>"ติดตั้งแอป" (Install app)</strong> หรือ <strong>"เพิ่มลงในหน้าจอหลัก"</strong> 📱</p>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:flex-start;gap:0.85rem;background:#fff;border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.9rem;">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">4</div>
+              <div>
+                <strong style="font-size:0.92rem;color:var(--text-main);">กดยืนยัน "ติดตั้ง"</strong>
+                <p style="font-size:0.82rem;color:var(--text-muted);margin-top:2px;">ระบบจะเพิ่มไอคอนแอปน่ารักๆ ลงบนหน้าจอมือถือของคุณทันทีค่ะ!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Highlight Note -->
+        <div style="margin-top:1.15rem;background:linear-gradient(135deg,var(--primary-soft),#fff);border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.85rem 1rem;display:flex;align-items:center;gap:0.6rem;">
+          <span style="font-size:1.3rem;">✨</span>
+          <span style="font-size:0.82rem;color:var(--text-main);line-height:1.4;">
+            <strong>ข้อดี:</strong> ใช้งานได้เต็มจอ ไม่มีแถบ URL มากวนใจ ไม่เปลืองพื้นที่เครื่อง และเปิดได้สะดวกรวดเร็วเหมือนแอปจริง 100% เลยค่ะ 🌸💖
+          </span>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" style="width:100%;" data-close-modal>เข้าใจแล้วค่ะ 🌸</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       HIDDEN CONTAINERS FOR HIGH-RES IMAGE EXPORT
+       ========================================================================= -->
+  <div class="export-container">
+    <!-- 9:16 Phone Wallpaper Frame -->
+    <div id="phoneExportFrame" class="export-phone-frame"></div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Main ES6 Modules -->
+  <script type="module" src="js/app.js?v=3.2"></script>
+
+</body>
+</html>

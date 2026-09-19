@@ -1,0 +1,17 @@
+{
+  "name": "Cute Timetable & GPA Master",
+  "short_name": "ตารางเรียน",
+  "description": "แอปสร้างตารางเรียนและคำนวณเกรด ม.หอการค้าไทย (UTCC)",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fff5f7",
+  "theme_color": "#ff7597",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='25' fill='%23ff7597'/><text x='50%' y='55%' font-size='50' text-anchor='middle' dominant-baseline='central'>🎀</text></svg>",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
