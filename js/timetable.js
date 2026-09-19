@@ -14,9 +14,9 @@ class TimetableManager {
   constructor() {
     this.classes = Storage.load(STORAGE_KEYS.TIMETABLE, DEFAULT_TIMETABLE_CLASSES);
     this.history = Storage.load(STORAGE_KEYS.AUTOCOMPLETE_HISTORY, {
-      codes: ['MK101', 'DM201', 'BA102', 'DM205', 'EN101', 'MK202', 'FN201'],
-      titles: ['หลักการตลาด', 'การตลาดดิจิทัลเบื้องต้น', 'การบัญชีสำหรับนักบริหาร', 'การสร้างสรรค์คอนเทนต์ดิจิทัล', 'ภาษาอังกฤษเพื่อการสื่อสารธุรกิจ', 'พฤติกรรมผู้บริโภค'],
-      rooms: ['7301 (อาคาร 7)', '10204 (Lab คอม)', '5202', 'Studio อาคาร 3', 'Online Zoom']
+      codes: [],
+      titles: [],
+      rooms: []
     });
     this.activeEditId = null;
   }
